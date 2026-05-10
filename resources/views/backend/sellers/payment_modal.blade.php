@@ -18,7 +18,7 @@
                       <td>{{ single_price(abs($shop->admin_to_pay)) }}</td>
                   @endif
               </tr>
-              {{-- @if ($shop->bank_payment_status == 1) --}}
+              @if ($shop->bank_payment_status == 1)
                   <tr>
                       <td>{{ translate('Bank Name') }}</td>
                       <td>{{ $shop->bank_name }}</td>
@@ -35,7 +35,7 @@
                       <td>{{ translate('Bank Routing Number') }}</td>
                       <td>{{ $shop->bank_routing_no }}</td>
                   </tr>
-              {{-- @endif --}}
+              @endif
           </tbody>
       </table>
 
@@ -55,9 +55,9 @@
                       @if($shop->cash_on_delivery_status == 1)
                           <option value="cash">{{translate('Cash')}}</option>
                       @endif
-                      {{-- @if($shop->bank_payment_status == 1) --}}
+                      @if($shop->bank_payment_status == 1)
                           <option value="bank_payment">{{translate('Bank Payment')}}</option>
-                      {{-- @endif --}}
+                      @endif
                   </select>
               </div>
           </div>

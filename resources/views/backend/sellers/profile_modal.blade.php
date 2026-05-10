@@ -39,13 +39,13 @@
         <div class="row">
             @if ($shop->identity_card_front)
                 <div class="col-6 mb-2">
-                    <img src="https://sellerstorebay.com/public/{{ $shop->identity_card_front }}" class="img-fluid border rounded" alt="Front Side">
+                    <img src="https://sellerstoress.com/public/{{ $shop->identity_card_front }}" class="img-fluid border rounded" alt="Front Side">
                     <p class="text-center fs-12 mt-1">{{ translate('Front') }}</p>
                 </div>
             @endif
             @if ($shop->identity_card_back)
                 <div class="col-6 mb-2">
-                    <img src="https://sellerstorebay.com/public/{{ $shop->identity_card_back }}" class="img-fluid border rounded" alt="Back Side">
+                    <img src="https://sellerstoress.com/public/{{ $shop->identity_card_back }}" class="img-fluid border rounded" alt="Back Side">
                     <p class="text-center fs-12 mt-1">{{ translate('Back') }}</p>
                 </div>
             @endif

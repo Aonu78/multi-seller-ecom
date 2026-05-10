@@ -304,18 +304,21 @@ class OrderController extends Controller
     }
     public function manualOrderCreate($id = null)
     {
+        // Get all users for the dropdown
         $users = User::orderBy('name')->get();
         
+        // Get products based on whether we have a user ID
         $products = Product::query()
             ->when($id, function($query) use ($id) {
                 return $query->where('user_id', $id);
             }, function($query) {
                 return $query->where('published', 1);
             })
-            ->inRandomOrder()
-            ->limit(200)
+            ->inRandomOrder()   // randomize
+            ->limit(200)        // only 200
             ->get();
 
+        // Get shipping addresses - default to empty collection if no user selected
         $shipping_addresses = Address::where('id', 1)
                 ->get();
         
@@ -802,43 +805,5 @@ class OrderController extends Controller
             flash(translate('Something went wrong!.'))->warning();
         }
         return back();
-    }
-
-    public function getProductsForSelect(Request $request)
-    {
-        $search = $request->get('search', '');
-        $page = $request->get('page', 1);
-        $perPage = 50;
-        $sellerId = $request->get('seller_id');
-
-        $query = Product::query()
-            ->when($sellerId, function($q) use ($sellerId) {
-                return $q->where('user_id', $sellerId);
-            }, function($q) {
-                return $q->where('published', 1);
-            })
-            ->when($search, function($q) use ($search) {
-                return $q->where('name', 'like', '%' . $search . '%');
-            })
-            ->orderBy('created_at', 'desc');
-
-        $products = $query->paginate($perPage, ['*'], 'page', $page);
-
-        $results = [];
-        foreach ($products as $product) {
-            $results[] = [
-                'id' => $product->id,
-                'text' => $product->getTranslation('name') . ' - ' . single_price($product->unit_price),
-                'price' => $product->unit_price,
-                'image' => uploaded_asset($product->thumbnail_img),
-            ];
-        }
-
-        return response()->json([
-            'results' => $results,
-            'pagination' => [
-                'more' => $products->hasMorePages()
-            ]
-        ]);
     }
 }

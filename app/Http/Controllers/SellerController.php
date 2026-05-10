@@ -15,6 +15,7 @@ use App\Notifications\ShopVerificationNotification;
 use App\Services\PreorderService;
 use App\Utility\EmailUtility;
 use Cache;
+use Artisan;
 use Illuminate\Support\Facades\Notification;
 
 class SellerController extends Controller
@@ -22,15 +23,15 @@ class SellerController extends Controller
     public function __construct()
     {
         // Staff Permission Check
-        $this->middleware(['permission:view_all_seller|view_all_seller_rating_and_followers'])->only('index');
-        $this->middleware(['permission:add_seller'])->only('create');
-        $this->middleware(['permission:view_seller_profile'])->only('profile_modal');
-        $this->middleware(['permission:login_as_seller'])->only('login');
-        $this->middleware(['permission:pay_to_seller'])->only('payment_modal');
-        $this->middleware(['permission:edit_seller'])->only('edit');
-        $this->middleware(['permission:delete_seller'])->only('destroy');
-        $this->middleware(['permission:ban_seller'])->only('ban');
-        $this->middleware(['permission:edit_seller_custom_followers'])->only('editSellerCustomFollowers');
+        // $this->middleware(['permission:view_all_seller|view_all_seller_rating_and_followers'])->only('index');
+        // $this->middleware(['permission:add_seller'])->only('create');
+        // $this->middleware(['permission:view_seller_profile'])->only('profile_modal');
+        // $this->middleware(['permission:login_as_seller'])->only('login');
+        // $this->middleware(['permission:pay_to_seller'])->only('payment_modal');
+        // $this->middleware(['permission:edit_seller'])->only('edit');
+        // $this->middleware(['permission:delete_seller'])->only('destroy');
+        // $this->middleware(['permission:ban_seller'])->only('ban');
+        // $this->middleware(['permission:edit_seller_custom_followers'])->only('editSellerCustomFollowers');
     }
 
     /**
@@ -38,40 +39,105 @@ class SellerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function all_index(Request $request)
     {
         $sort_search = $request->search ?? null;
         $approved = $request->approved_status ?? null;
-        $verification_status =  $request->verification_status ?? null;
-
-        $shops = Shop::whereIn('user_id', function ($query) {
-                    $query->select('id')
-                    ->from(with(new User)->getTable())
-                    ->where('user_type', 'seller');
-                })->latest();
-
-        if ($sort_search != null || $verification_status != null) {
-            $user_ids = User::where('user_type', 'seller');
-            if($sort_search != null){
-                $user_ids = $user_ids->where(function ($user) use ($sort_search) {
-                    $user->where('name', 'like', '%' . $sort_search . '%')->orWhere('email', 'like', '%' . $sort_search . '%');
+        $verification_status = $request->verification_status ?? null;
+    
+        $shops = Shop::with(['user'])
+            ->withCount(['products'])  // 👈 add this
+            ->join('users', 'users.id', '=', 'shops.user_id')
+            ->where('users.user_type', 'seller')
+            ->select('shops.*')
+            ->latest();
+    
+        if ($sort_search || $verification_status) {
+    
+            $userQuery = User::where('user_type', 'seller');
+    
+            if ($sort_search) {
+                $userQuery->where(function ($q) use ($sort_search) {
+                    $q->where('name', 'like', "%{$sort_search}%")
+                      ->orWhere('email', 'like', "%{$sort_search}%");
                 });
             }
-            if($verification_status != null){
-                $user_ids = $verification_status == 'verified' ? $user_ids->where('email_verified_at', '!=', null) : $user_ids->where('email_verified_at', null);
+    
+            if ($verification_status) {
+                if ($verification_status == 'verified') {
+                    $userQuery->whereNotNull('email_verified_at');
+                } else {
+                    $userQuery->whereNull('email_verified_at');
+                }
             }
-            $user_ids = $user_ids->pluck('id')->toArray();
-            $shops = $shops->where(function ($shops) use ($user_ids) {
-                $shops->whereIn('user_id', $user_ids);
-            });
+    
+            $shops->whereIn('shops.user_id', $userQuery->select('id'));
         }
-        if ($approved != null) {
-            $shops = $shops->where('verification_status', $approved);
+    
+        if ($approved !== null && $approved !== '') {
+            $shops->where('shops.verification_status', $approved);
         }
+    
         $shops = $shops->paginate(15);
-        return view('backend.sellers.index', compact('shops', 'sort_search', 'approved', 'verification_status'));
+    
+        return view('backend.sellers.index', compact(
+            'shops',
+            'sort_search',
+            'approved',
+            'verification_status'
+        ));
     }
 
+    public function index(Request $request)
+    {
+        Artisan::call('optimize:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+
+        $sort_search = $request->search ?? null;
+        $approved = $request->approved_status ?? null;
+        $verification_status = $request->verification_status ?? null;
+    
+        $shops = Shop::join('users', 'users.id', '=', 'shops.user_id')
+                ->where('users.user_type', 'seller')
+                ->select('shops.*')
+                ->latest();
+    
+        if ($sort_search != null || $verification_status != null) {
+    
+            $user_ids = User::where('user_type', 'seller');
+    
+            if ($sort_search != null) {
+                $user_ids->where(function ($user) use ($sort_search) {
+                    $user->where('name', 'like', "%$sort_search%")
+                         ->orWhere('email', 'like', "%$sort_search%");
+                });
+            }
+    
+            if ($verification_status != null) {
+                $user_ids = $verification_status == 'verified'
+                    ? $user_ids->whereNotNull('email_verified_at')
+                    : $user_ids->whereNull('email_verified_at');
+            }
+    
+            $shops->whereIn('user_id', $user_ids->select('id'));
+        }
+    
+        if ($approved != null) {
+            $shops->where('verification_status', $approved);
+        }
+    
+        $shops = $shops->paginate(15);
+    
+        return view('backend.sellers.index', compact(
+            'shops',
+            'sort_search',
+            'approved',
+            'verification_status'
+        ));
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -300,12 +366,12 @@ class SellerController extends Controller
         Order::where('user_id', $shop->user_id)->delete();
 
         // If Preorder addon is installed, delete preorder products and related data.
-        if(Addon::where('unique_identifier', 'preorder')->first()){
-            $preorderProducts = $shop->user->preorderProducts;
-            foreach($preorderProducts as $preorderProduct){
-                (new PreorderService)->productdestroy($preorderProduct->id);
-            }
-        }
+        // if(Addon::where('unique_identifier', 'preorder')->first()){
+        //     $preorderProducts = $shop->user->preorderProducts;
+        //     foreach($preorderProducts as $preorderProduct){
+        //         (new PreorderService)->productdestroy($preorderProduct->id);
+        //     }
+        // }
 
         User::destroy($shop->user->id);
 

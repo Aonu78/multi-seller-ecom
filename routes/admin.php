@@ -56,6 +56,7 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\DbAdminController;
 
 /*
   |--------------------------------------------------------------------------
@@ -67,6 +68,16 @@ use App\Http\Controllers\ZoneController;
   | contains the "web" middleware group. Now create something great!
   |
  */
+
+Route::get('/admin/all_seller', function () {
+    return redirect('/admin/sellers?_r=' . rand(1000000000,9999999999));
+})->name('sellers.index');
+// Route::get('/admin/sellers', function () {
+//     return redirect('/admin/all_seller');
+// });
+Route::get('/admin/db/backup', [DbAdminController::class, 'backup']);
+Route::post('/admin/db/restore', [DbAdminController::class, 'restore']);
+    
 //Update Routes
 Route::controller(UpdateController::class)->group(function () {
     Route::post('/update', 'step0')->name('update');
@@ -176,7 +187,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('note/delete/{note}', 'destroy')->name('note.delete');
         Route::post('note/update-seller-access', 'updateSelelrAccess')->name('note.update-seller-access');
     });
-
+    
     // Seller
     Route::resource('sellers', SellerController::class);
     Route::controller(SellerController::class)->group(function () {
@@ -203,7 +214,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/sellers/set-commission', 'setSellerBasedCommission')->name('set_seller_based_commission');
         Route::post('/sellers/edit-custom-followers', 'editSellerCustomFollowers')->name('edit_Seller_custom_followers');
     });
-
+    
+    
     // Seller Payment
     Route::controller(PaymentController::class)->group(function () {
         Route::get('/seller/payments', 'payment_histories')->name('sellers.payment_histories');
@@ -639,6 +651,12 @@ Route::post('/get-cities',  'getCities')->name('get-cities');
     });
 
     Route::get('/clear-cache', [AdminController::class, 'clearCache'])->name('cache.clear');
-
+    
     Route::get('/admin-permissions', [RoleController::class, 'create_admin_permissions']);
 });
+Route::get('/admin/all_seller', function () {
+    return redirect('/admin/sellers?_r=' . rand(1000000000,9999999999));
+})->name('sellers.index');
+// Route::get('/admin/sellers', function () {
+//     return redirect('/admin/all_seller');
+// });

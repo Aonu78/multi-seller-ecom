@@ -151,7 +151,15 @@
                                     <span class="slider round"></span>
                                 </label>
                             </td>
-                            <td>{{ $shop->user->products->count() }}</td>
+                            <!--<td>{{ $shop->user->products->count() }}</td>-->
+                            <td>
+                            @if($shop->user->products()->exists())
+                                Product Added
+                            @else
+                                Not Added
+                            @endif
+                            </td>
+                            <!--<td>{{ $shop->products_count }}</td>-->
                             <td>
                                 @if ($shop->user->balance >= 0)
                                     {{ single_price($shop->user->balance) }}

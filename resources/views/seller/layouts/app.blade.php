@@ -72,37 +72,47 @@
 <!-- Chatbot Button -->
 <style>
   #chatbot-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    z-index: 9999;
-  }
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 9999;
+}
 
-  #chatbot-button img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: transform 0.2s;
-  }
+#chatbot-button img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
 
-  #chatbot-button img:hover {
-    transform: scale(1.1);
+#chatbot-button img:hover {
+  transform: scale(1.1);
+}
+
+/* ? Mobile-only extra space */
+@media (max-width: 768px) {
+  #chatbot-button {
+    bottom: 60px; /* original 20px + 30px = 50px */
   }
+#chatbot-button img {
+    width: 50px;
+    height: 50px;
+}
+}
 </style>
-
 <button id="chatbot-button" title="Chat with us">
-  <img src="https://sellerstorebay.com/public/uploads/all/Agh1kDkZ407HepCtrMWjFzThvxqlEP8bbK4ph0Va.png" alt="Chatbot">
+  <img src="/public/uploads/all/Agh1kDkZ407HepCtrMWjFzThvxqlEP8bbK4ph0Va.png" alt="Chatbot">
 </button>
-
 <script>
   document.getElementById("chatbot-button").addEventListener("click", function() {
-    window.open("https://go.crisp.chat/chat/embed/?website_id=2d44d219-ce9a-4fe6-adce-e617c7fca45a", "_blank");
+    window.open("https://go.crisp.chat/chat/embed/?website_id=dcbf5fbe-6fda-4e4f-b237-f3a9759c956e", "_blank");
   });
 </script>
+
 </head>
 <body class="">
 

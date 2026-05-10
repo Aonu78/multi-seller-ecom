@@ -16,7 +16,7 @@ use App\Models\Wishlist;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
 use Carbon\Carbon;
-use CoreComponentRepository;
+// use CoreComponentRepository;
 use Artisan;
 use Cache;
 use App\Services\ProductService;
@@ -66,15 +66,14 @@ class ProductController extends Controller
      */
     public function admin_products(Request $request)
     {
-      // CoreComponentRepository::instantiateShopRepository();
-
+        
         $type = 'In House';
         $col_name = null;
         $query = null;
         $sort_search = null;
 
         $products = Product::where('added_by', 'admin')->where('auction_product', 0)->where('wholesale_product', 0);
-
+        
         if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
@@ -82,6 +81,7 @@ class ProductController extends Controller
             $products = $products->orderBy($col_name, $query);
             $sort_type = $request->type;
         }
+        
         if ($request->search != null) {
             $sort_search = $request->search;
             $products = $products
@@ -178,7 +178,6 @@ class ProductController extends Controller
      */
     public function create()
     {
-     // CoreComponentRepository::initializeCache();
 
         $categories = Category::where('parent_id', 0)
             ->where('digital', 0)

@@ -117,11 +117,11 @@
                                 </a>
                             </li>
 
-                            {{-- <li class="aiz-side-nav-item">
-                                <a href="{{ route('seller.preorder-commission-history') }}" class="aiz-side-nav-link">
-                                    <span class="aiz-side-nav-text">{{translate("Preorder Commission History")}}</span>
-                                </a>
-                            </li> --}}
+                            <!--<li class="aiz-side-nav-item">-->
+                            <!--    <a href="{{ route('seller.preorder-commission-history') }}" class="aiz-side-nav-link">-->
+                            <!--        <span class="aiz-side-nav-text">{{translate("Preorder Commission History")}}</span>-->
+                            <!--    </a>-->
+                            <!--</li>-->
 
                             @if (get_setting('conversation_system') == 1)
                                 <li class="aiz-side-nav-item">
@@ -336,12 +336,12 @@
                     </a>
                 </li>
 
-                {{-- <li class="aiz-side-nav-item">
-                    <a href="{{ route('seller.commission-history.index') }}" class="aiz-side-nav-link">
-                        <i class="las la-file-alt aiz-side-nav-icon"></i>
-                        <span class="aiz-side-nav-text">{{ translate('Commission History') }}</span>
-                    </a>
-                </li> --}}
+                <!--<li class="aiz-side-nav-item">-->
+                <!--    <a href="{{ route('seller.commission-history.index') }}" class="aiz-side-nav-link">-->
+                <!--        <i class="las la-file-alt aiz-side-nav-icon"></i>-->
+                <!--        <span class="aiz-side-nav-text">{{ translate('Commission History') }}</span>-->
+                <!--    </a>-->
+                <!--</li>-->
 
                 @if (get_setting('conversation_system') == 1)
                     @php
