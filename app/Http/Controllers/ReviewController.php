@@ -47,7 +47,14 @@ class ReviewController extends Controller
                 });
             });
         }        
-        $products = $products->select("products.id","products.thumbnail_img", "products.name", "products.user_id",  "products.rating")->paginate(15);
+        $products = $products->select("products.id","products.thumbnail_img", "products.name", "products.user_id",  "products.rating")
+            ->groupBy(
+                'products.id',
+                'products.thumbnail_img',
+                'products.name',
+                'products.user_id',
+                'products.rating'
+            )->paginate(15);
         $sellers = User::whereUserType('seller')->where('email_verified_at','!=', null)->get();
         return view('backend.product.reviews.index', compact('products', 'sellers', 'sortSearch','sortByRating', 'sellerID'));
     }

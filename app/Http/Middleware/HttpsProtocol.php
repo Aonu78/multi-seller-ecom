@@ -14,7 +14,8 @@ class HttpsProtocol {
      */
     public function handle($request, Closure $next)
     {
-        if (env('FORCE_HTTPS') == "On" && !$request->secure()) {
+        // Skip HTTPS redirect in local development
+        if (app()->environment() !== 'local' && env('FORCE_HTTPS') == "On" && !$request->secure()) {
             return redirect()->secure($request->getRequestUri());
         }
         return $next($request);

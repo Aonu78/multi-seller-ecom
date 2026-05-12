@@ -255,7 +255,7 @@
                                             {{ translate('In-house Sales') }}
                                         </h3>
                                         <h3 class="fs-13 fw-600 mb-0">
-                                            {{ single_price($admin_sale_this_month->total_sale) }}
+                                            {{ single_price($admin_sale_this_month->total_sale ?? 0) }}
                                         </h3>
                                     </div>
                                     <!-- Sellers Sales -->
@@ -266,7 +266,7 @@
                                             {{ translate('Sellers Sales') }}
                                         </h3>
                                         <h3 class="fs-13 fw-600 mb-0">
-                                            {{ single_price($seller_sale_this_month->total_sale) }}
+                                            {{ single_price($seller_sale_this_month->total_sale ?? 0) }}
                                         </h3>
                                     </div>
                                 </div>

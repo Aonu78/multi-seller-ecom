@@ -1167,13 +1167,22 @@ if (!function_exists('app_timezone')) {
 
 //return file uploaded via uploader
 if (!function_exists('uploaded_asset')) {
+
     function uploaded_asset($id)
     {
-        if (($asset = Upload::find($id)) != null) {
-            return $asset->external_link == null ? my_asset($asset->file_name) : $asset->external_link;
+        if (!$id || $id === '') {
+            return static_asset('assets/img/placeholder.jpg');
         }
+
+        if (($asset = Upload::find((int)$id)) != null) {
+            return $asset->external_link == null
+                ? my_asset($asset->file_name)
+                : $asset->external_link;
+        }
+
         return static_asset('assets/img/placeholder.jpg');
     }
+
 }
 
 if (!function_exists('my_asset')) {

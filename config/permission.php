@@ -142,7 +142,7 @@ return [
          * When permissions or roles are updated the cache is flushed automatically.
          */
 
-        'expiration_time' => \DateInterval::createFromDateString('24 hours'),
+        'expiration_time' => \DateInterval::createFromDateString('1 hours'),
 
         /*
          * The cache key used to store all permissions.
@@ -156,6 +156,6 @@ return [
          * file. Using 'default' here means to use the `default` set in cache.php.
          */
 
-        'store' => 'default',
+        'store' => 'file',
     ],
 ];

@@ -26,7 +26,15 @@ class ReviewController extends Controller
                 });
             });
         }        
-        $products = $products->select("products.id","products.thumbnail_img", "products.name", "products.user_id",  "products.rating")->paginate(15);
+        $products = $products->select("products.id","products.thumbnail_img", "products.name", "products.user_id",  "products.rating")
+        ->groupBy(
+            'products.id',
+            'products.thumbnail_img',
+            'products.name',
+            'products.user_id',
+            'products.rating'
+        )
+        ->paginate(15);
         return view('seller.product_review.index', compact('products', 'sortSearch','sortByRating'));
     }
 

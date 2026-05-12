@@ -50,9 +50,11 @@ class DashboardController extends Controller
         $data['last_7_days_sales'] = Order::where('created_at', '>=', Carbon::now()->subDays(7))
                                 ->where('seller_id', '=', Auth::user()->id)
                                 ->where('delivery_status', '=', 'delivered')
-                                ->select(DB::raw("sum(grand_total) as total, DATE_FORMAT(created_at, '%d %b') as date"))
-                                ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d')"))
-                                ->get()->pluck('total', 'date');  
+                                ->select(
+                                    DB::raw('sum(grand_total) as total'),
+                                    DB::raw("TO_CHAR(created_at, 'DD Mon') as date")
+                                )
+                                ->groupBy(DB::raw("TO_CHAR(created_at, 'YYYY-MM-DD')")); 
 
         return view('seller.dashboard', $data);
     }
