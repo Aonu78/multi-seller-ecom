@@ -10,7 +10,7 @@ use Auth;
 use Hash;
 use App\Utility\EmailUtility;
 use Illuminate\Support\Facades\Notification;
-
+use Illuminate\Support\Facades\Log;
 class ShopController extends Controller
 {
 
@@ -59,73 +59,198 @@ class ShopController extends Controller
      */
     public function store(SellerRegistrationRequest $request)
     {
+        Log::info('Seller registration started');
+
         $inviter = User::where('referral_code', $request->invitation_code)->first();
 
+        Log::info('Invitation code checked', [
+            'invitation_code' => $request->invitation_code,
+            'inviter_found' => $inviter ? true : false
+        ]);
+
         if (!$inviter) {
-            return back()->withErrors(['invitation_code' => 'Invalid invitation code.'])->withInput();
+            Log::error('Invalid invitation code');
+
+            return back()->withErrors([
+                'invitation_code' => 'Invalid invitation code.'
+            ])->withInput();
         }
-        
+
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->user_type = "seller";
         $user->password = Hash::make($request->password);
 
+        Log::info('Saving user');
+
         if ($user->save()) {
+
+            Log::info('User saved successfully', [
+                'user_id' => $user->id
+            ]);
+
             $shop = new Shop;
             $shop->user_id = $user->id;
             $shop->name = $request->shop_name;
             $shop->address = $request->address;
             $shop->slug = preg_replace('/\s+/', '-', str_replace("/", " ", $request->shop_name));
-            
+
             $shop->transaction_password = $request->transaction_password;
 
-            // Save certificate type and invitation code
             $shop->certificate_type = $request->certtype;
             $shop->invitation_code = $request->invitation_code;
+
+            Log::info('Shop model prepared');
+
             if ($request->hasFile('identity_card_front')) {
-                $shop->identity_card_front = $request->file('identity_card_front')->store('uploads/certificates');
+
+                Log::info('Uploading identity_card_front');
+
+                $shop->identity_card_front = $request
+                    ->file('identity_card_front')
+                    ->store('uploads/certificates');
+
+                Log::info('identity_card_front uploaded', [
+                    'path' => $shop->identity_card_front
+                ]);
             }
 
             if ($request->hasFile('identity_card_back')) {
-                $shop->identity_card_back = $request->file('identity_card_back')->store('uploads/certificates');
+
+                Log::info('Uploading identity_card_back');
+
+                $shop->identity_card_back = $request
+                    ->file('identity_card_back')
+                    ->store('uploads/certificates');
+
+                Log::info('identity_card_back uploaded', [
+                    'path' => $shop->identity_card_back
+                ]);
             }
 
-            $shop->save();
+            Log::info('Saving shop');
+
+            try {
+
+                $shop->save();
+
+                Log::info('Shop saved successfully', [
+                    'shop_id' => $shop->id
+                ]);
+
+            } catch (\Throwable $e) {
+
+                Log::error('Shop save failed', [
+                    'message' => $e->getMessage(),
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile()
+                ]);
+
+                throw $e;
+            }
 
             auth()->login($user, false);
-            if (BusinessSetting::where('type', 'email_verification')->first()->value == 0) {
-                $user->email_verified_at = date('Y-m-d H:m:s');
+
+            Log::info('User logged in');
+
+            $emailVerification = BusinessSetting::where('type', 'email_verification')->first();
+
+            Log::info('Email verification setting loaded', [
+                'value' => optional($emailVerification)->value
+            ]);
+
+            if ($emailVerification && $emailVerification->value == 0) {
+
+                Log::info('Auto verifying seller email');
+
+                $user->email_verified_at = date('Y-m-d H:i:s');
                 $user->save();
+
             } else {
+
                 try {
+
+                    Log::info('Sending seller verification email');
+
                     EmailUtility::email_verification($user, 'seller');
+
+                    Log::info('Seller verification email sent');
+
                 } catch (\Throwable $th) {
+
+                    Log::error('Seller verification email failed', [
+                        'message' => $th->getMessage(),
+                        'line' => $th->getLine(),
+                        'file' => $th->getFile()
+                    ]);
+
                     $shop->delete();
                     $user->delete();
+
                     flash(translate('Seller registration failed. Please try again later.'))->error();
+
                     return back();
                 }
             }
 
-            // Account Opening Email to Seller
+            Log::info('Checking seller registration email template');
+
             if ((get_email_template_data('registration_email_to_seller', 'status') == 1)) {
+
                 try {
-                    EmailUtility::selelr_registration_email('registration_email_to_seller', $user, null);
-                } catch (\Exception $e) {}
+
+                    Log::info('Sending registration email to seller');
+
+                    EmailUtility::selelr_registration_email(
+                        'registration_email_to_seller',
+                        $user,
+                        null
+                    );
+
+                    Log::info('Registration email sent to seller');
+
+                } catch (\Exception $e) {
+
+                    Log::error('Seller email failed', [
+                        'message' => $e->getMessage()
+                    ]);
+                }
             }
 
-            // Seller Account Opening Email to Admin
             if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
+
                 try {
-                    EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
-                } catch (\Exception $e) {}
+
+                    Log::info('Sending seller registration email to admin');
+
+                    EmailUtility::selelr_registration_email(
+                        'seller_reg_email_to_admin',
+                        $user,
+                        null
+                    );
+
+                    Log::info('Seller registration email sent to admin');
+
+                } catch (\Exception $e) {
+
+                    Log::error('Admin email failed', [
+                        'message' => $e->getMessage()
+                    ]);
+                }
             }
+
+            Log::info('Seller registration completed successfully');
 
             flash(translate('Your Shop has been created successfully!'))->success();
+
             return redirect()->route('seller.shop.index');
         }
+
+        Log::error('User save failed');
+
         flash(translate('Sorry! Something went wrong.'))->error();
+
         return back();
     }
 

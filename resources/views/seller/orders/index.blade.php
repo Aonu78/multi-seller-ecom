@@ -159,11 +159,7 @@
                                                 title="{{ translate('Order Details') }}">
                                                 <i class="las la-eye"></i>
                                             </a>
-                                            <!--<a href="{{ route('seller.invoice.download', $order->id) }}"-->
-                                            <!--    class="btn btn-soft-warning btn-icon btn-circle btn-sm"-->
-                                            <!--    title="{{ translate('Download Invoice') }}">-->
-                                            <!--    <i class="las la-download"></i>-->
-                                            <!--</a>-->
+                                           
                                         </td>
                                     </tr>
                                 @endif

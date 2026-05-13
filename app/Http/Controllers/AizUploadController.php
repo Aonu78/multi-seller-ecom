@@ -10,6 +10,7 @@ use Storage;
 use Image;
 use enshrined\svgSanitize\Sanitizer;
 use Str;
+use Illuminate\Support\Facades\Log;
 
 class AizUploadController extends Controller
 {
@@ -54,6 +55,7 @@ class AizUploadController extends Controller
 
     public function create()
     {
+        Log::info('Uploader started');
         if(env('DEMO_MODE') == 'On'){
             flash(translate('Data can not change in demo mode.'))->info();
             return back();
@@ -107,11 +109,17 @@ class AizUploadController extends Controller
             "xls" => "document",
             "xlsx" => "document"
         );
-
+        Log::info('Uploader started');
         if ($request->hasFile('aiz_file')) {
+            Log::info('File detected', [
+                'original_name' => $request->file('aiz_file')->getClientOriginalName(),
+                'size' => $request->file('aiz_file')->getSize()
+            ]);
             $upload = new Upload;
             $extension = strtolower($request->file('aiz_file')->getClientOriginalExtension());
-
+            Log::info('Extension detected', [
+                'extension' => $extension
+            ]);
             if (
                 env('DEMO_MODE') == 'On' &&
                 isset($type[$extension]) &&
@@ -119,7 +127,7 @@ class AizUploadController extends Controller
             ) {
                 return '{}';
             }
-
+            Log::info('Starting image processing');
             if (isset($type[$extension])) {
                 $upload->file_original_name = null;
                 $arr = explode('.', $request->file('aiz_file')->getClientOriginalName());
@@ -154,7 +162,9 @@ class AizUploadController extends Controller
                         $img = Image::make($request->file('aiz_file')->getRealPath())->encode($extension, 75);
                         $height = $img->height();
                         $width = $img->width();
-
+                        Log::info('Generating image path', [
+                            'path' => $path
+                        ]);
                         // watermark
                         if (get_setting('use_image_watermark') == 'on') {
                             $watermark_position = get_setting('watermark_position', 'top-left');
@@ -231,10 +241,21 @@ class AizUploadController extends Controller
                         }
 
                         $img->save(base_path('public/') . $path);
+                        
+
                         clearstatcache();
                         $size = $img->filesize();
+                        Log::info('Image saved successfully', [
+                            'path' => $path,
+                            'size' => $size
+                        ]);
                     } catch (\Exception $e) {
                         //dd($e);
+                        Log::error('Image processing failed', [
+                            'message' => $e->getMessage(),
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile()
+                        ]);
                     }
                 }else{
                     $path = $request->file('aiz_file')->store('uploads/all', 'local');
@@ -265,7 +286,25 @@ class AizUploadController extends Controller
                 $upload->user_id = Auth::user()->id;
                 $upload->type = $type[$upload->extension];
                 $upload->file_size = $size;
-                $upload->save();
+
+                try {
+
+                    $upload->save();
+
+                    Log::info('Upload saved successfully', [
+                        'upload_id' => $upload->id
+                    ]);
+
+                } catch (\Throwable $e) {
+
+                    Log::error('Upload DB save failed', [
+                        'message' => $e->getMessage(),
+                        'line' => $e->getLine(),
+                        'file' => $e->getFile()
+                    ]);
+
+                    throw $e;
+                }
             }
             return '{}';
         }

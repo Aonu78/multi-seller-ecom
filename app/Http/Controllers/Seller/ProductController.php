@@ -91,19 +91,21 @@ class ProductController extends Controller
         // Filter admin products excluding already enlisted ones
         $all_products = Product::where('added_by', 'admin')
                             ->whereNotIn('id', $alreadyEnlistedIds);
-        
-                            if(get_setting('vendor_commission_activation')){
-            
-        $commission_percentage = get_setting('vendor_commission');
-            
+
+        $commission_percentage = 0;
+
+        if(get_setting('vendor_commission_activation')){
+            $commission_percentage = get_setting('vendor_commission');
         }
+
         $products = $all_products->paginate(100);
         $count_listed = Category::count();
 
-        return view('seller.product.products.product_warehouse', compact('products', 'count_listed', 'commission_percentage'));
+        return view(
+            'seller.product.products.product_warehouse',
+            compact('products', 'count_listed', 'commission_percentage')
+        );
     }
-
-
 
     public function create(Request $request)
     {

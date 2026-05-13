@@ -428,7 +428,6 @@ Route::post('/get-cities',  'getCities')->name('get-cities');
         Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
         Route::post('/bulk-order-delete', 'bulk_order_delete')->name('bulk-order-delete');
 
-        Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
         Route::post('/orders/details', 'order_details')->name('orders.details');
         Route::post('/orders/update_delivery_status', 'update_delivery_status')->name('orders.update_delivery_status');
         Route::post('/orders/update_payment_status', 'update_payment_status')->name('orders.update_payment_status');

@@ -13,7 +13,10 @@
                 </div>
                 @php
                     $delivery_status = $order->delivery_status;
-                    $payment_status = $order->orderDetails->where('seller_id', Auth::user()->id)->first()->payment_status;
+
+                    $payment_status = $order->orderDetails
+                        ->where('seller_id', Auth::user()->id)
+                        ->first()?->payment_status;
                 @endphp
                 @if (get_setting('product_manage_by_admin') == 0)
                     <div class="col-md-3 ml-auto d-flex">
@@ -297,10 +300,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <!--<div class="no-print text-right">-->
-                <!--    <a href="{{ route('seller.invoice.download', $order->id) }}" type="button"-->
-                <!--        class="btn btn-icon btn-light"><i class="las la-print"></i></a>-->
-                <!--</div>-->
+                
             </div>
 
         </div>

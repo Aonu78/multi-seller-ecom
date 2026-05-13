@@ -41,7 +41,10 @@
 
                     <div class="col-md-3 ml-auto">
                         <label for="update_payment_status">{{ translate('Payment Status') }}</label>
-                        @if (auth()->user()->can('update_order_payment_status') && $payment_status == 'unpaid')
+                        @if (
+                            auth()->user()->can('update_order_payment_status')
+                            && ($payment_status ?? 'unpaid') == 'unpaid'
+                        )
                             {{-- <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity" id="update_payment_status"> --}}
                             <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity" id="update_payment_status" onchange="confirm_payment_status()">
                                 <option value="unpaid" @if ($payment_status == 'unpaid') selected @endif>
@@ -354,7 +357,7 @@
                     </tbody>
                 </table>
                 <div class="no-print text-right">
-                    <a href="{{ route('invoice.download', $order->id) }}" type="button" class="btn btn-icon btn-light"><i
+                    <a href="" type="button" class="btn btn-icon btn-light"><i
                             class="las la-print"></i></a>
                 </div>
             </div>
@@ -384,6 +387,12 @@
             </div>
         </div>
     </div>
+    <script>
+    function confirm_payment_status(){
+            $('#confirm-payment-status').modal('show');
+        };
+
+    </script>
 @endsection
 
 
@@ -414,9 +423,6 @@
         });
 
         // Payment Status Update
-        function confirm_payment_status(value){
-            $('#confirm-payment-status').modal('show');
-        }
 
         function update_payment_status(){
             $('#confirm-payment-status').modal('hide');
