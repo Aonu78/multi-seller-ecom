@@ -164,7 +164,7 @@ class ProductController extends Controller
             $sort_type = $request->type;
         }
 
-        $products = $products->orderBy('created_at', 'desc')->paginate(15);
+        $products = $products->orderBy('created_at', 'desc')->paginate(150);
         $type = 'All';
 
         return view('backend.product.products.index', compact('products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
