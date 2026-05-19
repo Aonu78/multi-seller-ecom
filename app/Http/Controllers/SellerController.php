@@ -15,7 +15,6 @@ use App\Notifications\ShopVerificationNotification;
 use App\Services\PreorderService;
 use App\Utility\EmailUtility;
 use Cache;
-use Artisan;
 use Illuminate\Support\Facades\Notification;
 
 class SellerController extends Controller
@@ -90,20 +89,16 @@ class SellerController extends Controller
 
     public function index(Request $request)
     {
-        Artisan::call('optimize:clear');
-        Artisan::call('cache:clear');
-        Artisan::call('config:clear');
-        Artisan::call('route:clear');
-        Artisan::call('view:clear');
-
         $sort_search = $request->search ?? null;
         $approved = $request->approved_status ?? null;
         $verification_status = $request->verification_status ?? null;
     
-        $shops = Shop::join('users', 'users.id', '=', 'shops.user_id')
+        $shops = Shop::with(['user'])
+                ->withExists(['products as has_products'])
+                ->join('users', 'users.id', '=', 'shops.user_id')
                 ->where('users.user_type', 'seller')
                 ->select('shops.*')
-                ->latest();
+                ->latest('shops.created_at');
     
         if ($sort_search != null || $verification_status != null) {
     

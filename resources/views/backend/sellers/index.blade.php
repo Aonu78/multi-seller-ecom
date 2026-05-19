@@ -153,7 +153,7 @@
                             </td>
                             <!--<td>{{ $shop->user->products->count() }}</td>-->
                             <td>
-                            @if($shop->user->products()->exists())
+                            @if($shop->has_products)
                                 Product Added
                             @else
                                 Not Added

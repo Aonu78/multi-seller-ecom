@@ -23,6 +23,7 @@ use App\Services\ProductTaxService;
 use App\Services\ProductFlashDealService;
 use App\Services\ProductStockService;
 use App\Services\FrequentlyBoughtProductService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
 class ProductController extends Controller
@@ -53,7 +54,12 @@ class ProductController extends Controller
         $search = null;
         // $products = Product::where('added_by', 'admin')->orderBy('created_at', 'desc');
 
-        $products = Product::where('user_id', Auth::user()->id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc');
+        $products = Product::with(['stocks'])
+            ->where('user_id', Auth::user()->id)
+            ->where('digital', 0)
+            ->where('auction_product', 0)
+            ->where('wholesale_product', 0)
+            ->orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $search = $request->search;
             $products = $products->where('name', 'like', '%' . $search . '%');
@@ -73,7 +79,7 @@ class ProductController extends Controller
     }
     public function listedProducts()
     {
-        $all_products = Product::where('user_id', Auth::user()->id);
+        $all_products = Product::with(['stocks'])->where('user_id', Auth::user()->id);
         $products = $all_products->paginate(10);
         $count_listed = $all_products->count();
         return view('seller.product.products.listed', compact('products', 'count_listed'));
@@ -83,14 +89,16 @@ class ProductController extends Controller
     {
         $userId = auth()->id();
 
-        // Get all parent_ids of products already enlisted by this user
-        $alreadyEnlistedIds = Product::where('user_id', $userId)
-                                    ->whereNotNull('parent_id')
-                                    ->pluck('parent_id');
-
-        // Filter admin products excluding already enlisted ones
-        $all_products = Product::where('added_by', 'admin')
-                            ->whereNotIn('id', $alreadyEnlistedIds);
+        // Filter admin products without materializing every enlisted parent_id in PHP.
+        $all_products = Product::with(['stocks'])
+            ->where('added_by', 'admin')
+            ->whereNotExists(function ($query) use ($userId) {
+                $query->select(DB::raw(1))
+                    ->from('products as enlisted_products')
+                    ->where('enlisted_products.user_id', $userId)
+                    ->whereNotNull('enlisted_products.parent_id')
+                    ->whereColumn('enlisted_products.parent_id', 'products.id');
+            });
 
         $commission_percentage = 0;
 
@@ -464,9 +472,13 @@ class ProductController extends Controller
         // Handle "ALL" case: get all admin products NOT already enlisted by the user
         if ($productIds === 'ALL') {
             $productIds = Product::where('added_by', 'admin')
-                ->whereNotIn('id', Product::where('user_id', $userId)
-                                        ->whereNotNull('parent_id')
-                                        ->pluck('parent_id'))
+                ->whereNotExists(function ($query) use ($userId) {
+                    $query->select(DB::raw(1))
+                        ->from('products as enlisted_products')
+                        ->where('enlisted_products.user_id', $userId)
+                        ->whereNotNull('enlisted_products.parent_id')
+                        ->whereColumn('enlisted_products.parent_id', 'products.id');
+                })
                 ->pluck('id')
                 ->toArray();
         }

@@ -305,7 +305,9 @@ class OrderController extends Controller
     public function manualOrderCreate($id = null)
     {
         // Get all users for the dropdown
-        $users = User::orderBy('name')->get();
+        $users = User::where('user_type', 'customer')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
         
         // Get products based on whether we have a user ID
         $products = Product::query()
@@ -314,8 +316,8 @@ class OrderController extends Controller
             }, function($query) {
                 return $query->where('published', 1);
             })
-            ->inRandomOrder()   // randomize
-            ->limit(200)        // only 200
+            ->orderByDesc('id')
+            ->limit(200)
             ->get();
 
         // Get shipping addresses - default to empty collection if no user selected

@@ -72,7 +72,10 @@ class ProductController extends Controller
         $query = null;
         $sort_search = null;
 
-        $products = Product::where('added_by', 'admin')->where('auction_product', 0)->where('wholesale_product', 0);
+        $products = Product::with(['stocks', 'user'])
+            ->where('added_by', 'admin')
+            ->where('auction_product', 0)
+            ->where('wholesale_product', 0);
         
         if ($request->type != null) {
             $var = explode(",", $request->type);
@@ -84,11 +87,12 @@ class ProductController extends Controller
         
         if ($request->search != null) {
             $sort_search = $request->search;
-            $products = $products
-                ->where('name', 'like', '%' . $sort_search . '%')
+            $products = $products->where(function ($q) use ($sort_search) {
+                $q->where('name', 'like', '%' . $sort_search . '%')
                 ->orWhereHas('stocks', function ($q) use ($sort_search) {
                     $q->where('sku', 'like', '%' . $sort_search . '%');
                 });
+            });
         }
 
         $products = $products->where('digital', 0)->orderBy('created_at', 'desc')->paginate(15);
@@ -107,7 +111,10 @@ class ProductController extends Controller
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::where('added_by', 'seller')->where('auction_product', 0)->where('wholesale_product', 0);
+        $products = Product::with(['stocks', 'user'])
+            ->where('added_by', 'seller')
+            ->where('auction_product', 0)
+            ->where('wholesale_product', 0);
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
             $seller_id = $request->user_id;
@@ -140,7 +147,10 @@ class ProductController extends Controller
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::where('auction_product', 0)->where('parent_id', null)->where('wholesale_product', 0);
+        $products = Product::with(['stocks', 'user'])
+            ->where('auction_product', 0)
+            ->where('parent_id', null)
+            ->where('wholesale_product', 0);
         if (get_setting('vendor_system_activation') != 1) {
             $products = $products->where('added_by', 'admin');
         }
@@ -150,11 +160,12 @@ class ProductController extends Controller
         }
         if ($request->search != null) {
             $sort_search = $request->search;
-            $products = $products
-                ->where('name', 'like', '%' . $sort_search . '%')
+            $products = $products->where(function ($q) use ($sort_search) {
+                $q->where('name', 'like', '%' . $sort_search . '%')
                 ->orWhereHas('stocks', function ($q) use ($sort_search) {
                     $q->where('sku', 'like', '%' . $sort_search . '%');
                 });
+            });
         }
         if ($request->type != null) {
             $var = explode(",", $request->type);
