@@ -24,9 +24,11 @@
             </button>
         </div>
     @endif
-
+    @php
+        $nav_txt_color = ((get_setting('header_nav_menu_text') == 'light') ||  (get_setting('header_nav_menu_text') == null)) ? 'text-white' : 'text-dark';
+    @endphp
     <!-- Top Bar -->
-    <div class="top-navbar bg-dark z-1035 h-35px h-sm-auto">
+    <div class="top-navbar bg-primary z-1035 h-35px h-sm-auto">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 col">
@@ -35,7 +37,7 @@
                         @if (get_setting('show_language_switcher') == 'on')
                             <li class="list-inline-item dropdown mr-4" id="lang-change">
 
-                                <a href="javascript:void(0)" class="dropdown-toggle text-white fs-12 py-2"
+                                <a href="javascript:void(0)" class="dropdown-toggle {{ $nav_txt_color }} fs-12 py-2"
                                     data-toggle="dropdown" data-display="static">
                                     <span class="">{{ $system_language->name }}</span>
                                 </a>
@@ -62,7 +64,7 @@
                                     $system_currency = get_system_currency();
                                 @endphp
 
-                                <a href="javascript:void(0)" class="dropdown-toggle text-white fs-12 py-2"
+                                <a href="javascript:void(0)" class="dropdown-toggle {{ $nav_txt_color }} fs-12 py-2"
                                     data-toggle="dropdown" data-display="static">
                                     {{ $system_currency->name }}
                                 </a>
@@ -88,19 +90,19 @@
                             <!-- Become a Seller -->
                             <li class="list-inline-item mr-0 pl-0 py-2">
                                 <a href="{{ route('shops.create') }}"
-                                    class="text-white fs-12 pr-3 d-inline-block border-width-2 border-right">{{ translate('Become a Seller !') }}</a>
+                                    class="{{ $nav_txt_color }} fs-12 pr-3 d-inline-block border-width-2 border-right">{{ translate('Become a Seller !') }}</a>
                             </li>
                             <!-- Seller Login -->
                             <li class="list-inline-item mr-0 pl-0 py-2">
                                 <a href="{{ route('seller.login') }}"
-                                    class="text-white fs-12 pl-3 d-inline-block">{{ translate('Login to Seller') }}</a>
+                                    class="{{ $nav_txt_color }} fs-12 pl-3 d-inline-block">{{ translate('Login to Seller') }}</a>
                             </li>
                         @endif
                         @if (get_setting('helpline_number'))
                             <!-- Helpline -->
                             <li class="list-inline-item ml-3 pl-3 mr-0 pr-0">
                                 <a href="tel:{{ get_setting('helpline_number') }}"
-                                    class="text-white fs-12 d-inline-block py-2">
+                                    class="{{ $nav_txt_color }} fs-12 d-inline-block py-2">
                                     <span>{{ translate('Helpline') }}</span>
                                     <span>{{ get_setting('helpline_number') }}</span>
                                 </a>
@@ -111,10 +113,10 @@
             </div>
         </div>
     </div>
-
+    
     <header class="@if (get_setting('header_stikcy') == 'on') sticky-top @endif z-1020 bg-white">
         <!-- Search Bar -->
-        <div class="position-relative logo-bar-area border-bottom border-md-nonea z-1025 bg-dark text-white">
+        <div class="position-relative logo-bar-area border-bottom border-md-nonea z-1025 bg-primary {{ $nav_txt_color }}">
             <div class="container">
                 <div class="d-flex align-items-center">
                     <!-- top menu sidebar button -->
@@ -336,7 +338,7 @@
                         </ul>
                     @endif
 
-                    <div class="d-none d-xl-block ml-auto mr-0 bg-dark text-white">
+                    <div class="d-none d-xl-block ml-auto mr-0 bg-primary {{ $nav_txt_color }}">
                         @auth
                             <span
                                 class="d-flex align-items-center nav-user-info py-20px @if (isAdmin()) ml-5 @endif"
@@ -354,7 +356,7 @@
                                     @endif
                                 </span>
                                 <!-- Name -->
-                                <h4 class="h5 fs-14 fw-700 text-white ml-2 mb-0">{{ $user->name }}</h4>
+                                <h4 class="h5 fs-14 fw-700 {{ $nav_txt_color }} ml-2 mb-0">{{ $user->name }}</h4>
                             </span>
                         @else
                             <!--Login & Registration -->
@@ -593,15 +595,16 @@
             <div class="container h-100">
                 <div class="d-flex h-100">
                     <!-- Categoty Menu Button -->
+                    
                     <div class="d-none d-xl-block all-category has-transition bg-black-10" id="category-menu-bar">
                         <div class="px-3 h-100"
                             style="padding-top: 12px;padding-bottom: 12px; width:270px; cursor: pointer;">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <span class="fw-700 fs-16 text-white mr-3">{{ translate('Categories') }}</span>
-                                    <a href="{{ route('categories.all') }}" class="text-reset categoriesAll">
+                                    <span class="fw-700 fs-16 {{ $nav_txt_color }} mr-3">{{ translate('Categories') }}</span>
+                                    <a href="{{ route('categories.all') }}" class="text-reset {{ $nav_txt_color }} categoriesAll">
                                         <span
-                                            class="d-none d-lg-inline-block text-white animate-underline-white">({{ translate('See All') }})</span>
+                                            class="d-none d-lg-inline-block {{ $nav_txt_color }} animate-underline-white">({{ translate('See All') }})</span>
                                     </a>
                                 </div>
                                 <i class="las la-angle-down text-white has-transition" id="category-menu-bar-icon"
@@ -610,9 +613,7 @@
                         </div>
                     </div>
                     <!-- Header Menus -->
-                    @php
-                        $nav_txt_color = ((get_setting('header_nav_menu_text') == 'light') ||  (get_setting('header_nav_menu_text') == null)) ? 'text-white' : 'text-dark';
-                    @endphp
+                    
                     <div class="ml-xl-4 w-100 overflow-hidden">
                         <div class="d-flex align-items-center justify-content-center justify-content-xl-start h-100">
                             <ul class="list-inline mb-0 pl-0 hor-swipe c-scrollbar-light">
@@ -690,9 +691,9 @@
                                 transform="translate(-2.064 -1.995)" fill="#91919b" />
                         </svg>
                     </span>
-                    <a href="{{ route('user.login') }}"
+                    <a href="{{ route('seller.login') }}"
                         class="text-reset hov-opacity-100 hov-text-primary fs-12 d-inline-block border-right border-soft-light border-width-2 pr-2 ml-3">{{ translate('Login') }}</a>
-                    <a href="{{ route('user.registration') }}"
+                    <a href="{{ route('shops.create') }}"
                         class="text-reset hov-opacity-100 hov-text-primary fs-12 d-inline-block py-2 pl-2">{{ translate('Registration') }}</a>
                 </span>
             @endauth

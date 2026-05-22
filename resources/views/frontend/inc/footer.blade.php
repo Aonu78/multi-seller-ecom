@@ -108,7 +108,9 @@
 </section> --}}
 
 <!-- footer subscription & icons -->
-<section class="py-3 text-light footer-widget border-bottom" style="border-color: #3d3d46 !important; background-color: #212129 !important;">
+<section class="py-3 text-light footer-widget border-bottom" 
+{{-- style="border-color: #3d3d46 !important; background-color: #212129 !important;" --}}
+>
     <div class="container">
         <!-- footer logo -->
         <div class="mt-3 mb-4">
@@ -328,7 +330,7 @@
                             <li class="mb-2">
                                 <p class="fs-13 text-soft-light mb-0">
                                     {{ translate('Become A Seller') }}
-                                    <a href="{{ route('shops.create') }}" class="fs-13 fw-700 text-secondary-base ml-2"><br><span class="btn btn-primary">{{ translate('Apply Now') }}</span></a>
+                                    <a href="{{ route('shops.create') }}" class="fs-13 fw-700 text-secondary-base ml-2"><br><span class="btn btn-danger">{{ translate('Apply Now') }}</span></a>
                                 </p>
                             </li>
                             @guest

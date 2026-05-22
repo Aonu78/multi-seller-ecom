@@ -8,8 +8,11 @@
         }
     }
 @endphp
+@php
+    $nav_txt_color = ((get_setting('header_nav_menu_text') == 'light') ||  (get_setting('header_nav_menu_text') == null)) ? 'text-white' : 'text-dark';
+@endphp
 <!-- Cart button with cart count -->
-<a href="javascript:void(0)" class="d-flex align-items-center text-dark px-3 h-100" data-toggle="dropdown" data-display="static" title="{{translate('Cart')}}">
+<a href="javascript:void(0)" class="d-flex align-items-center {{ $nav_txt_color }} px-3 h-100" data-toggle="dropdown" data-display="static" title="{{translate('Cart')}}">
     <span class="mr-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="20.562" viewBox="0 0 24 20.562">
             <g id="_5e67fc94b53aaec8ca181b806dd815ee" data-name="5e67fc94b53aaec8ca181b806dd815ee" transform="translate(-33.276 -101)">
@@ -23,8 +26,8 @@
             </g>
         </svg>
     </span>
-    <span class="d-none d-xl-block ml-2 fs-14 fw-700 text-white">{{ single_price($total) }}</span>
-    <span class="nav-box-text d-none d-xl-block ml-2 text-white fs-12">
+    <span class="d-none d-xl-block ml-2 fs-14 fw-700 {{ $nav_txt_color }}">{{ single_price($total) }}</span>
+    <span class="nav-box-text d-none d-xl-block ml-2 {{ $nav_txt_color }} fs-12">
 
         (<span class="cart-count">{{count($carts) > 0 ? count($carts) : 0 }}</span> {{translate('Items')}})
 
