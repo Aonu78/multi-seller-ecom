@@ -97,7 +97,7 @@
 
                                             <!-- Submit Button -->
                                             <div class="mb-4 mt-4">
-                                                <button type="submit" class="btn btn-primary btn-block fw-700 fs-14 rounded-0 submit-button">{{  translate('Login') }}</button>
+                                                <button type="submit" class="btn btn-danger btn-block fw-700 fs-14 rounded-0 submit-button">{{  translate('Login') }}</button>
                                             </div>
                                         </form>
 

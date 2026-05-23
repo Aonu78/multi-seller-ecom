@@ -123,7 +123,7 @@
 
                                             <!-- Submit Button -->
                                             <div class="mb-4 mt-4">
-                                                <button type="submit" class="btn btn-primary btn-block fw-600 rounded-0">{{  translate('Create Account') }}</button>
+                                                <button type="submit" class="btn btn-danger btn-block fw-600 rounded-0">{{  translate('Create Account') }}</button>
                                             </div>
                                         </form>
                                         
