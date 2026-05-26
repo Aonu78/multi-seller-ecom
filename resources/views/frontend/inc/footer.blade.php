@@ -503,7 +503,7 @@
                         <li class="mb-2 pb-2 {{ areActiveRoutes(['shops.create'],' active')}}">
                             <p class="fs-13 text-soft-light text-sm-secondary mb-0">
                                 {{ translate('Become A Seller') }}
-                                <a href="{{ route('shops.create') }}" class="fs-13 fw-700 text-secondary-base ml-2"><br><span class="btn btn-primary">{{ translate('Apply Now') }}</span></a>
+                                <a href="{{ route('shops.create') }}" class="fs-13 fw-700 text-secondary-base ml-2"><br><span class="btn btn-danger">{{ translate('Apply Now') }}</span></a>
                             </p>
                         </li>
                         @guest
@@ -591,19 +591,19 @@
     <div class="row align-items-center gutters-5">
         <!-- Home -->
         <div class="col">
-            <a href="{{ route('home') }}" class="text-secondary d-block text-center pb-2 pt-3 {{ areActiveRoutes(['home'],'svg-active')}}">
+            <a href="{{ route('home') }}" class="text-secondary d-block text-center pb-2 pt-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                     <g id="Group_24768" data-name="Group 24768" transform="translate(3495.144 -602)">
                       <path id="Path_2916" data-name="Path 2916" d="M15.3,5.4,9.561.481A2,2,0,0,0,8.26,0H7.74a2,2,0,0,0-1.3.481L.7,5.4A2,2,0,0,0,0,6.92V14a2,2,0,0,0,2,2H14a2,2,0,0,0,2-2V6.92A2,2,0,0,0,15.3,5.4M10,15H6V9A1,1,0,0,1,7,8H9a1,1,0,0,1,1,1Zm5-1a1,1,0,0,1-1,1H11V9A2,2,0,0,0,9,7H7A2,2,0,0,0,5,9v6H2a1,1,0,0,1-1-1V6.92a1,1,0,0,1,.349-.76l5.74-4.92A1,1,0,0,1,7.74,1h.52a1,1,0,0,1,.651.24l5.74,4.92A1,1,0,0,1,15,6.92Z" transform="translate(-3495.144 602)" fill="#b5b5bf"/>
                     </g>
                 </svg>
-                <span class="d-block mt-1 fs-10 fw-600 text-reset {{ areActiveRoutes(['home'],'text-primary')}}">{{ translate('Home') }}</span>
+                <span class="d-block mt-1 fs-10 fw-600 text-reset">{{ translate('Home') }}</span>
             </a>
         </div>
 
         <!-- Categories -->
         <div class="col">
-            <a href="{{ route('categories.all') }}" class="text-secondary d-block text-center pb-2 pt-3 {{ areActiveRoutes(['categories.all'],'svg-active')}}">
+            <a href="{{ route('categories.all') }}" class="text-secondary d-block text-center pb-2 pt-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                     <g id="Group_25497" data-name="Group 25497" transform="translate(3373.432 -602)">
                       <path id="Path_2917" data-name="Path 2917" d="M126.713,0h-5V5a2,2,0,0,0,2,2h3a2,2,0,0,0,2-2V2a2,2,0,0,0-2-2m1,5a1,1,0,0,1-1,1h-3a1,1,0,0,1-1-1V1h4a1,1,0,0,1,1,1Z" transform="translate(-3495.144 602)" fill="#91919c"/>
@@ -612,7 +612,7 @@
                       <path id="Path_2920" data-name="Path 2920" d="M125.213,18a3.5,3.5,0,1,0,3.5,3.5,3.5,3.5,0,0,0-3.5-3.5m0,6a2.5,2.5,0,1,1,2.5-2.5,2.5,2.5,0,0,1-2.5,2.5" transform="translate(-3495.144 593)" fill="#91919c"/>
                     </g>
                 </svg>
-                <span class="d-block mt-1 fs-10 fw-600 text-reset {{ areActiveRoutes(['categories.all'],'text-primary')}}">{{ translate('Categories') }}</span>
+                <span class="d-block mt-1 fs-10 fw-600 text-reset">{{ translate('Categories') }}</span>
             </a>
         </div>
 
@@ -622,7 +622,7 @@
                 $count = count(get_user_cart());
             @endphp
             <div class="col-auto">
-                <a href="{{ route('cart') }}" class="text-secondary d-block text-center pb-2 pt-3 px-3 {{ areActiveRoutes(['cart'],'svg-active')}}">
+                <a href="{{ route('cart') }}" class="text-secondary d-block text-center pb-2 pt-3 px-3 ">
                     <span class="d-inline-block position-relative px-2">
                         <svg id="Group_25499" data-name="Group 25499" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16.001" height="16" viewBox="0 0 16.001 16">
                             <defs>
@@ -640,7 +640,7 @@
                             <span class="badge badge-sm badge-dot badge-circle badge-primary position-absolute absolute-top-right" style="right: 5px;top: -2px;"></span>
                         @endif
                     </span>
-                    <span class="d-block mt-1 fs-10 fw-600 text-reset {{ areActiveRoutes(['cart'],'text-primary')}}">
+                    <span class="d-block mt-1 fs-10 fw-600 text-reset">
                         {{ translate('Cart') }}
                         (<span class="cart-count">{{$count}}</span>)
                     </span>
@@ -658,7 +658,7 @@
                             <span class="badge badge-sm badge-dot badge-circle badge-primary position-absolute absolute-top-right" style="right: 5px;top: -2px;"></span>
                         @endif
                     </span>
-                    <span class="d-block mt-1 fs-10 fw-600 text-reset {{ areActiveRoutes(['customer.all-notifications'],'text-primary')}}">{{ translate('Notifications') }}</span>
+                    <span class="d-block mt-1 fs-10 fw-600 text-reset">{{ translate('Notifications') }}</span>
                 </a>
             </div>
         @endif

@@ -73,7 +73,7 @@
 <style>
   #chatbot-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 60px;
   right: 20px;
   background-color: transparent;
   border: none;

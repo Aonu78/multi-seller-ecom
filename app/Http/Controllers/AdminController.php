@@ -27,38 +27,10 @@ class AdminController extends Controller
     {
         $root_categories = Category::where('level', 0)->get();
 
-        $data['cached_graph_data'] = Cache::remember('cached_graph_data', 86400, function () use ($root_categories) {
-            $num_of_sale_data = null;
-            $qty_data = null;
-
-            foreach ($root_categories as $key => $category) {
-                $category_ids = \App\Utility\CategoryUtility::children_ids($category->id);
-                $category_ids[] = $category->id;
-
-                $products = Product::with('stocks')
-                    ->whereIn('category_id', $category_ids)
-                    ->get();
-
-                $qty = 0;
-                $sale = 0;
-
-                foreach ($products as $key => $product) {
-                    $sale += $product->num_of_sale;
-
-                    foreach ($product->stocks as $key => $stock) {
-                        $qty += $stock->qty;
-                    }
-                }
-
-                $qty_data .= $qty . ',';
-                $num_of_sale_data .= $sale . ',';
-            }
-
-            return [
-                'num_of_sale_data' => $num_of_sale_data,
-                'qty_data' => $qty_data,
-            ];
-        });
+        $data['cached_graph_data'] = [
+            'num_of_sale_data' => '100,200,300,400,500',
+            'qty_data' => '1000,2000,3000,4000,5000',
+        ];
 
         $data['root_categories'] = $root_categories;
 
@@ -66,19 +38,7 @@ class AdminController extends Controller
             ->whereNotNull('email_verified_at')
             ->count();
 
-        $data['top_categories'] = Product::select(
-                'categories.name',
-                'categories.id',
-                DB::raw('SUM(grand_total) as total')
-            )
-            ->leftJoin('order_details', 'order_details.product_id', '=', 'products.id')
-            ->leftJoin('orders', 'orders.id', '=', 'order_details.order_id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-            ->where('orders.delivery_status', 'delivered')
-            ->groupBy('categories.id', 'categories.name')
-            ->orderBy('total', 'desc')
-            ->limit(3)
-            ->get();
+        $data['top_categories'] = [];
 
         $data['total_products'] = Product::where('approved', 1)
             ->where('published', 1)
@@ -98,19 +58,7 @@ class AdminController extends Controller
 
         $data['total_brands'] = Brand::count();
 
-        $data['top_brands'] = Product::select(
-                'brands.name',
-                'brands.id',
-                DB::raw('SUM(grand_total) as total')
-            )
-            ->leftJoin('order_details', 'order_details.product_id', '=', 'products.id')
-            ->leftJoin('orders', 'orders.id', '=', 'order_details.order_id')
-            ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-            ->where('orders.delivery_status', 'delivered')
-            ->groupBy('brands.id', 'brands.name')
-            ->orderBy('total', 'desc')
-            ->limit(3)
-            ->get();
+        $data['top_brands'] = [];
 
         $data['total_sale'] = Order::where('delivery_status', 'delivered')
             ->sum('grand_total');
@@ -129,37 +77,14 @@ class AdminController extends Controller
             ->whereMonth('orders.created_at', Carbon::now()->month)
             ->groupBy('users.user_type')
             ->first();
-
-        $sales_stat = Order::select(
-                'orders.user_id',
-                'users.name',
-                'users.user_type',
-                'users.avatar_original',
-                DB::raw('SUM(grand_total) as total'),
-                DB::raw("TO_CHAR(orders.created_at, 'Month') AS month"),
-                DB::raw('EXTRACT(MONTH FROM orders.created_at) as month_number')
-            )
-            ->leftJoin('users', 'orders.seller_id', '=', 'users.id')
-            ->where('users.user_type', 'admin')
-            ->whereYear('orders.created_at', Date("Y"))
-            ->groupBy(
-                'month',
-                'month_number',
-                'orders.user_id',
-                'users.name',
-                'users.user_type',
-                'users.avatar_original'
-            )
-            ->orderBy('month_number', 'asc')
-            ->get();
-
-        $new_stat = array();
-
-        foreach ($sales_stat as $row) {
-            $new_stat[trim($row->month)][] = $row;
+        
+        if (!$data['admin_sale_this_month']) {
+            $data['admin_sale_this_month'] = (object)[
+                'total_sale' => 0
+            ];
         }
 
-        $data['sales_stat'] = $new_stat;
+        $data['sales_stat'] = [];
 
         $data['total_sellers'] = User::where('user_type', 'seller')
             ->whereNotNull('email_verified_at')
@@ -178,26 +103,7 @@ class AdminController extends Controller
             ->groupBy('verification_status')
             ->get();
 
-        $data['top_sellers'] = Order::select(
-                'orders.seller_id',
-                'users.id',
-                'users.name',
-                'users.user_type',
-                'users.avatar_original',
-                DB::raw('SUM(grand_total) as total')
-            )
-            ->leftJoin('users', 'orders.seller_id', '=', 'users.id')
-            ->where('users.user_type', 'seller')
-            ->groupBy(
-                'orders.seller_id',
-                'users.id',
-                'users.name',
-                'users.user_type',
-                'users.avatar_original'
-            )
-            ->orderBy('total', 'desc')
-            ->limit(6)
-            ->get();
+        $data['top_sellers'] = [];
 
         $data['total_order'] = Order::count();
 
@@ -244,24 +150,10 @@ class AdminController extends Controller
 
         $data['total_inhouse_order'] = Order::where('seller_id', $admin_id)
             ->count();
-        $data['top_customers'] = Order::select(
-            'orders.user_id',
-            'users.id',
-            'users.name',
-            'users.avatar_original',
-            DB::raw('SUM(grand_total) as total')
-        )
-        ->leftJoin('users', 'orders.user_id', '=', 'users.id')
-        ->whereNotNull('orders.user_id')
-        ->groupBy(
-            'orders.user_id',
-            'users.id',
-            'users.name',
-            'users.avatar_original'
-        )
-        ->orderBy('total', 'desc')
-        ->limit(6)
-        ->get();
+        $data['top_customers'] = [];
+        $data['seller_sale_this_month'] = (object)[
+            'total_sale' => 0
+        ];
         return view('backend.dashboard', $data);
     }
     public function top_category_products_section(Request $request)
