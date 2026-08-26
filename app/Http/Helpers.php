@@ -1199,7 +1199,28 @@ if (!function_exists('my_asset')) {
             return Storage::disk(config('filesystems.default'))->url($path);
         }
 
-        return app('url')->asset('public/' . $path, $secure);
+        return app('url')->asset(local_asset_path($path), $secure);
+    }
+}
+
+if (!function_exists('local_asset_path')) {
+    /**
+     * Build the public path for a locally stored asset without duplicating
+     * the public directory when APP_URL already ends with /public.
+     *
+     * @param string $path
+     * @return string
+     */
+    function local_asset_path($path)
+    {
+        $path = ltrim($path, '/');
+        $appUrlPath = trim((string) parse_url(config('app.url', ''), PHP_URL_PATH), '/');
+
+        if ($appUrlPath === 'public' || str_ends_with($appUrlPath, '/public')) {
+            return preg_replace('#^public/#', '', $path);
+        }
+
+        return str_starts_with($path, 'public/') ? $path : 'public/' . $path;
     }
 }
 
@@ -1213,7 +1234,7 @@ if (!function_exists('static_asset')) {
      */
     function static_asset($path, $secure = null)
     {
-        return app('url')->asset('public/' . $path, $secure);
+        return app('url')->asset(local_asset_path($path), $secure);
     }
 }
 
